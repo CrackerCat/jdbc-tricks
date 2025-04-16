@@ -1,4 +1,4 @@
-package com.demo;
+package com.jdbc.tricks;
 
 /**
  * Hello world!
