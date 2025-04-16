@@ -10,6 +10,6 @@ public class AllowLoadLocal_SpaceBetweenKeyValueBypass {
 
     public static void main(String[] args) {
         String url = "jdbc:mysql://127.0.0.1:3306/test?allowLoadLocal= true";
-        MysqlConnectionUtils.connect(url, "root", "root");
+        MysqlConnectionUtils.connect(url, "root", "root",true);
     }
 }

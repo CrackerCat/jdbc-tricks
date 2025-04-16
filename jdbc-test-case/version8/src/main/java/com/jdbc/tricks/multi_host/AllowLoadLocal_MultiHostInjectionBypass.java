@@ -10,6 +10,6 @@ public class AllowLoadLocal_MultiHostInjectionBypass {
 
     public static void main(String[] args) {
         String url = "jdbc:mysql://(127.0.0.1,allowLoadLocal=true)/test";
-        MysqlConnectionUtils.connect(url, "root", "root");
+        MysqlConnectionUtils.connect(url, "root", "root",true);
     }
 }

@@ -9,7 +9,7 @@ import com.jdbc.tricks.utils.MysqlConnectionUtils;
 public class DefaultProperties {
 
     public static void main(String[] args) {
-        String url = "jdbc:mysql://127.0.0.1:3306/test?allowLoadLocal=True";
-        MysqlConnectionUtils.connect(url, "root", "root");
+        String url = "jdbc:mysql://127.0.0.1:3306/test";
+        MysqlConnectionUtils.connect(url, "root", "root",true);
     }
 }

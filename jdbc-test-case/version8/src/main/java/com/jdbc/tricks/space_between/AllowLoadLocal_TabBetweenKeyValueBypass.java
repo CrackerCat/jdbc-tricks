@@ -10,6 +10,6 @@ public class AllowLoadLocal_TabBetweenKeyValueBypass {
 
     public static void main(String[] args) {
         String url = "jdbc:mysql://127.0.0.1:3306/test?allowLoadLocal=\ttrue";
-        MysqlConnectionUtils.connect(url, "root", "root");
+        MysqlConnectionUtils.connect(url, "root", "root", true);
     }
 }
