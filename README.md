@@ -24,23 +24,23 @@ jdbc-tricks/
 
 已知tricks：
 - default properties ：默认属性绕过
-  - [DefaultProperties.java](jdbc-test-case/version8/src/main/java/com/jdbc/tricks/default_properties/DefaultProperties.java)
+  - [DefaultProperties.java](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/default_properties/DefaultProperties.java)
 - multi host ：多host写法绕过
   - [Connection URL Syntax](https://dev.mysql.com/doc/connector-j/en/connector-j-reference-jdbc-url-format.html#connector-j-url-user-credentials) 
-  - [AllowLoadLocal_MultiHostInjectionBypass.java](jdbc-test-case/version8/src/main/java/com/jdbc/tricks/multi_host/AllowLoadLocal_MultiHostInjectionBypass.java)
+  - [AllowLoadLocal_MultiHostInjectionBypass.java](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/multi_host/AllowLoadLocal_MultiHostInjectionBypass.java)
 - space between ：键值插入空格绕过
-  - [AllowLoadLocal_SpaceBetweenKeyValueBypass.java](jdbc-test-case/version8/src/main/java/com/jdbc/tricks/space_between/AllowLoadLocal_SpaceBetweenKeyValueBypass.java)
+  - [AllowLoadLocal_SpaceBetweenKeyValueBypass.java](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/space_between/AllowLoadLocal_SpaceBetweenKeyValueBypass.java)
 - tab between  ：键值插入 \t 等制表符绕过
-  - [AllowLoadLocal_TabBetweenKeyValueBypass.java](jdbc-test-case/version8/src/main/java/com/jdbc/tricks/space_between/AllowLoadLocal_TabBetweenKeyValueBypass.java)
+  - [AllowLoadLocal_TabBetweenKeyValueBypass.java](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/space_between/AllowLoadLocal_TabBetweenKeyValueBypass.java)
 - upper case ：键值大写绕过
-  - [AllowLoadLocal_TrueUpperCaseBypass.java](jdbc-test-case/version8/src/main/java/com/jdbc/tricks/upper_case/AllowLoadLocal_TrueUpperCaseBypass.java)
+  - [AllowLoadLocal_TrueUpperCaseBypass.java](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/upper_case/AllowLoadLocal_TrueUpperCaseBypass.java)
 
 
 非会议公开内容：
 - bypass_max_allowed_packet 5.1.16版本示例
-  - [绕过max_allowed_packet参数](jdbc-test-case/version5/src/main/java/com/jdbc/tricks/default_properties/README.md)
-  - [DefaultProperties.java](jdbc-test-case/version5/src/main/java/com/jdbc/tricks/default_properties/DefaultProperties.java)
-  - [bypass_max_allowed_packet.py](jdbc-test-case/version5/src/main/java/com/jdbc/tricks/default_properties/bypass_max_allowed_packet.py)
+  - [绕过max_allowed_packet参数](jdbc-test-case/mysql-driver/version5/src/main/java/com/jdbc/tricks/default_properties/README.md)
+  - [DefaultProperties.java](jdbc-test-case/mysql-driver/version5/src/main/java/com/jdbc/tricks/default_properties/DefaultProperties.java)
+  - [bypass_max_allowed_packet.py](jdbc-test-case/mysql-driver/version5/src/main/java/com/jdbc/tricks/default_properties/bypass_max_allowed_packet.py)
 
 ### Other Driver Tricks
 > TODO
