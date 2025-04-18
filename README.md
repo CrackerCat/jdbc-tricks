@@ -26,7 +26,7 @@ jdbc-tricks/
 - default properties ：默认属性绕过
   - [DefaultProperties.java](jdbc-test-case/version8/src/main/java/com/jdbc/tricks/default_properties/DefaultProperties.java)
 - multi host ：多host写法绕过
-  - [Connection URL Syntax](ghttps://dev.mysql.com/doc/connector-j/en/connector-j-reference-jdbc-url-format.html#connector-j-url-user-credentials) 
+  - [Connection URL Syntax](https://dev.mysql.com/doc/connector-j/en/connector-j-reference-jdbc-url-format.html#connector-j-url-user-credentials) 
   - [AllowLoadLocal_MultiHostInjectionBypass.java](jdbc-test-case/version8/src/main/java/com/jdbc/tricks/multi_host/AllowLoadLocal_MultiHostInjectionBypass.java)
 - space between ：键值插入空格绕过
   - [AllowLoadLocal_SpaceBetweenKeyValueBypass.java](jdbc-test-case/version8/src/main/java/com/jdbc/tricks/space_between/AllowLoadLocal_SpaceBetweenKeyValueBypass.java)
