@@ -13,7 +13,6 @@
         <module>version5</module>
         <module>version8</module>
         <module>utils</module>
-        <module>postgreSQL</module>
     </modules>
 
     <properties>
