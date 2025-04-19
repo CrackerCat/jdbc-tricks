@@ -4,10 +4,12 @@
 
 ## 📊 案例分类
 
-| 所属项目         | cve编号 | 描述 | 对应分析详情文件 |
-|--------------|-------|------|----------|
-| Apache InLong | TODO  | 利用 JDBC URL 参数读取服务器文件 |          |
-| Apache InLong | TODO  | 通过 JDBC 连接触发反序列化漏洞 |          |
+1. [Apache_InLong_JDBC_multi-host_and_equalsIgnoreCase_bypass.pdf](real-world-case/Apache_InLong_JDBC_multi-host_and_equalsIgnoreCase_bypass.pdf)
+2. [Apache_InLong_JDBC_Vulnerability_Invisible_Character_Bypass.pdf](real-world-case/Apache_InLong_JDBC_Vulnerability_Invisible_Character_Bypass.pdf)
+3. [Apache_Linkis_MySQL_JDBC_Driver_Vulnerability_Arbitrary_File_Read_via_Double_URL_Encoding_Bypass.pdf](real-world-case/Apache_Linkis_MySQL_JDBC_Driver_Vulnerability_Arbitrary_File_Read_via_Double_URL_Encoding_Bypass.pdf)
+4. [Apache_zeppelin_H2_JDBC_RCE_Vulnerability.pdf](real-world-case/Apache_zeppelin_H2_JDBC_RCE_Vulnerability.pdf)
+
+
 
 
 ## 📋 案例提交指南
