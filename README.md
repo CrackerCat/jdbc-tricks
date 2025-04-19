@@ -54,6 +54,9 @@ jdbc-tricks/
 
 > 会议前暂不公开具体案例
 
+案例大纲：
+[real-world-case/README.md](real-world-case/README.md)
+
 
 ## 🤝 贡献指南
 
