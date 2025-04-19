@@ -41,6 +41,10 @@ jdbc-tricks/
   - [no-outbound/README.md](jdbc-test-case/mysql-driver/no-outbound/README.md)
 - multi-host and equalsIgnoreCase bypass
   - [AllowLoadLocal_MultiHost_equalsIgnoreCase_bypass](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/multi_host/AllowLoadLocal_MultiHost_equalsIgnoreCase_bypass.java)
+  - [equalsIgnoreCase bypass key fuzz case](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/multi_host/fuzzCase1.java)
+- other-between 
+  - [AllowLoadLocal_OtherBetweenKeyValueBypass.java](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/space_between/AllowLoadLocal_OtherBetweenKeyValueBypass.java)
+  - [ 空白字符fuzz case](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/space_between/fuzzCase2.java)
 
 
 非会议公开内容：
