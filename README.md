@@ -36,6 +36,11 @@ jdbc-tricks/
   - [AllowLoadLocal_TrueUpperCaseBypass.java](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/upper_case/AllowLoadLocal_TrueUpperCaseBypass.java)
 
 
+会议公开内容：
+- no-outbound：jdbc不出网利用
+  - [no-outbound/README.md](jdbc-test-case/mysql-driver/no-outbound/README.md)
+
+
 非会议公开内容：
 - bypass_max_allowed_packet 5.1.16版本示例
   - [绕过max_allowed_packet参数](jdbc-test-case/mysql-driver/version5/src/main/java/com/jdbc/tricks/default_properties/README.md)

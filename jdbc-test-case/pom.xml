@@ -12,6 +12,7 @@
     <modules>
         <module>mysql-driver</module>
         <module>utils</module>
+        <module>mysql-driver/no-outbound</module>
     </modules>
 
     <properties>
