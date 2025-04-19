@@ -39,6 +39,8 @@ jdbc-tricks/
 会议公开内容：
 - no-outbound：jdbc不出网利用
   - [no-outbound/README.md](jdbc-test-case/mysql-driver/no-outbound/README.md)
+- multi-host and equalsIgnoreCase bypass
+  - [AllowLoadLocal_MultiHost_equalsIgnoreCase_bypass](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/multi_host/AllowLoadLocal_MultiHost_equalsIgnoreCase_bypass.java)
 
 
 非会议公开内容：
