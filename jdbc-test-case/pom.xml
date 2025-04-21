@@ -13,7 +13,7 @@
         <module>mysql-driver</module>
         <module>utils</module>
         <module>mysql-driver/no-outbound</module>
-        <module>mysql-driver/not-outbound-spring</module>
+        <module>mysql-driver/no-outbound-spring</module>
     </modules>
 
     <properties>

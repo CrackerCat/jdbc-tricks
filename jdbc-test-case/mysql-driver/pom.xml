@@ -16,6 +16,8 @@
     <modules>
         <module>version5</module>
         <module>version8</module>
+        <module>no-outbound</module>
+        <module>no-outbound-spring</module>
     </modules>
 
     <properties>
