@@ -63,6 +63,9 @@ jdbc-tricks/
 案例大纲：
 [real-world-case/README.md](real-world-case/README.md)
 
+- 2025-04-20 L0ne1y 贡献案例集
+[real-world-case/2025-04-20-L0ne1y](real-world-case/2025-04-20-L0ne1y)
+
 
 ## 🤝 贡献指南
 
