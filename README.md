@@ -8,6 +8,8 @@
 
 本项目汇总了JDBC安全研究成果，专注于特殊URL构造技术与不出网反序列化利用方法的探索与实践。
 
+[English Version](README_EN.md)
+
 议题PPT附件：
 [深入JDBC安全：特殊URL构造与不出网反序列化利用技术揭秘.pptx](深入JDBC安全：特殊URL构造与不出网反序列化利用技术揭秘.pptx)
 
