@@ -52,6 +52,9 @@ Conference public content:
     - [Whitespace character fuzz case](jdbc-test-case/mysql-driver/version8/src/main/java/com/jdbc/tricks/space_between/fuzzCase2.java)
 - QuoteBypass
     - [QuoteBypass.java](jdbc-test-case/mysql-driver/version5/src/main/java/com/jdbc/tricks/quote_bypass/QuoteBypass.java)
+- ReplicationBypass
+    - [ReplicationBypass.java](jdbc-test-case/mysql-driver/version5/src/main/java/com/jdbc/tricks/replication/ReplicationBypass.java)
+
 
 Non-conference public content:
 
