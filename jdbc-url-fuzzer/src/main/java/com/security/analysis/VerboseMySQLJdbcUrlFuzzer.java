@@ -6,14 +6,19 @@ import com.code_intelligence.jazzer.api.FuzzedDataProvider;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.net.URLDecoder;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 通过发起真实连接来对 MySQL JDBC URL 进行 Fuzz 测试。
@@ -100,7 +105,10 @@ public class VerboseMySQLJdbcUrlFuzzer {
             // 这将触发JDBC驱动的完整解析逻辑。
             // 如果我们的Hook (MysqlFileReadHook) 检测到恶意行为 (如读取/etc/passwd),
             // 它会抛出RuntimeException, Jazzer会捕获并报告为安全问题。
-            conn = DriverManager.getConnection(jdbcUrl, "user", "password");
+
+            String filtered = Case.filterSensitive(jdbcUrl);
+
+            conn = DriverManager.getConnection(filtered, "user", "password");
             System.out.println("[SUCCESS] Connection established!");
         } catch (SQLException e) {
             Throwable cause = e.getCause();
@@ -258,5 +266,78 @@ public class VerboseMySQLJdbcUrlFuzzer {
         } catch (IOException e) {
             System.err.println("Failed to write finding to file: " + e.getMessage());
         }
+    }
+
+    static class Case {
+
+        private static final Pattern JDBC_URL_PATTERN = Pattern.compile(
+                "^jdbc:mysql://([a-zA-Z0-9.-]+)(:(\\d+))?/([a-zA-Z0-9_.-]+)(\\?(.*))?$"
+        );
+
+        private String driver = "com.mysql.cj.jdbc.Driver";
+        private String extraParams = "characterEncoding=UTF-8 & connectTimeout = 5000 & useSSL = false & allowPublicKeyRetrieval = true & zeroDateTimeBehavior = convertToNull ";
+        private static List<String> illegalParameters =
+                Arrays.asList("maxAllowedPacket", "autoDeserialize", "queryInterceptors",
+                        "statementInterceptors", "detectCustomCollations", "allowloadlocalinfile", "allowUrlInLocalInfile", "allowLoadLocalInfileInPath");
+        private List<String> showTableSqls = Arrays.asList("show tables");
+
+        private static boolean isBlank(String str) {
+            return str == null || str.trim().isEmpty();
+        }
+
+        public static String filterSensitive(String originalUrl) throws Exception {
+            if (isBlank(originalUrl)) {
+                throw new Exception("Input URL cannot be empty.");
+            }
+
+            // 1. 解析URL
+            Matcher matcher = JDBC_URL_PATTERN.matcher(originalUrl);
+            if (!matcher.matches()) {
+                throw new Exception("Invalid JDBC URL format. Expected: jdbc:mysql://host:port/database?params");
+            }
+
+            // 从正则表达式的捕获组中提取信息
+            String host = matcher.group(1);
+            // 如果端口不存在，则使用MySQL默认端口3306
+            String portStr = matcher.group(3);
+            int port = (portStr != null) ? Integer.parseInt(portStr) : 3306;
+            String database = matcher.group(4);
+            // 查询参数可能不存在
+            String queryParams = matcher.group(6);
+
+
+            // 2. 校验提取出的查询参数
+            if (!isBlank(queryParams)) {
+                try {
+                    String decodedParams = URLDecoder.decode(queryParams, StandardCharsets.UTF_8.name()).toLowerCase();
+                    for (String illegalParam : illegalParameters) {
+                        // 精确匹配 "参数名="
+                        if (decodedParams.contains(illegalParam.toLowerCase() + "=")) {
+                            throw new Exception("Illegal parameter detected in URL: " + illegalParam);
+                        }
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    throw new Exception("Failed to decode URL parameters", e);
+                }
+            }
+
+            // 3. 重构URL
+            // 使用解析出的、经过验证的组件来重新构建URL，确保安全。
+            StringBuilder safeUrlBuilder = new StringBuilder();
+            safeUrlBuilder.append("jdbc:mysql://")
+                    .append(host)
+                    .append(":")
+                    .append(port)
+                    .append("/")
+                    .append(database);
+
+            if (!isBlank(queryParams)) {
+                safeUrlBuilder.append("?").append(queryParams);
+            }
+
+            return safeUrlBuilder.toString();
+        }
+
+
     }
 }
