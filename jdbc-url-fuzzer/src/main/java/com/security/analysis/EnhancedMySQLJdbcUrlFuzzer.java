@@ -10,16 +10,22 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 增强版MySQL JDBC URL Fuzzer
- * 支持动态加载和测试多个CVE过滤器
+ * 支持动态加载和测试多个CVE过滤器，并引入了从文件加载种子的功能
  */
 public class EnhancedMySQLJdbcUrlFuzzer {
 
@@ -33,6 +39,9 @@ public class EnhancedMySQLJdbcUrlFuzzer {
 
     // 获取CVE过滤器管理器实例
     private static final HarnessFilterManager filterManager = HarnessFilterManager.getInstance();
+
+    // **改动**: 从硬编码数组改为动态列表，用于存储从文件读取的种子
+    private static final List<String> SEED_URLS = new ArrayList<>();
 
     // 定义通用的危险参数池，用于测试各种CVE
     private static final String[] DANGEROUS_PARAMETERS = {
@@ -84,6 +93,9 @@ public class EnhancedMySQLJdbcUrlFuzzer {
             Class.forName("com.mysql.cj.jdbc.Driver");
             System.out.println("[INIT] MySQL Driver loaded successfully");
 
+            // 从文件加载种子
+            loadSeedsFromFile("seeds/seeds.txt");
+
             // 初始化每个CVE的计数器
             for (HarnessFilter filter : filterManager.getFilters()) {
                 CVE_TEST_COUNTS.put(filter.getHarnessNumber(), new AtomicLong(0));
@@ -94,6 +106,27 @@ public class EnhancedMySQLJdbcUrlFuzzer {
 
         } catch (ClassNotFoundException e) {
             System.err.println("[ERROR] Failed to load MySQL driver: " + e);
+        }
+    }
+
+    /**
+     * **新增**: 从指定文件加载种子URL
+     * @param fileName 包含种子URL的文件名
+     */
+    private static void loadSeedsFromFile(String fileName) {
+        try {
+            // 从文件中读取所有行
+            List<String> lines = Files.readAllLines(Paths.get(fileName));
+            for (String line : lines) {
+                // 忽略空行和注释行 (以#开头)
+                if (line != null && !line.trim().isEmpty() && !line.trim().startsWith("#")) {
+                    SEED_URLS.add(line.trim());
+                }
+            }
+            System.out.println("[INIT] Loaded " + SEED_URLS.size() + " seeds from " + fileName);
+        } catch (IOException e) {
+            // 如果文件不存在或读取失败，打印警告并继续
+            System.err.println("[INIT] Warning: Could not read seeds file '" + fileName + "'. Proceeding without seeds. Reason: " + e.getMessage());
         }
     }
 
@@ -111,17 +144,30 @@ public class EnhancedMySQLJdbcUrlFuzzer {
         }
 
         // 随机选择一个CVE过滤器进行测试
-        HarnessFilter targetFilter = data.pickValue(filters.toArray(new HarnessFilter[0]));
+        HarnessFilter targetFilter = data.pickValue(filters);
         CVE_TEST_COUNTS.get(targetFilter.getHarnessNumber()).incrementAndGet();
 
-        // 生成变异的URL
+        // 随机决定是使用种子还是从头生成URL
+        String baseUrl;
+        // 检查种子列表是否为空
+        boolean useSeed = data.consumeBoolean() && !SEED_URLS.isEmpty();
+        if (useSeed) {
+            // 模式一：基于种子进行变异
+            baseUrl = data.pickValue(SEED_URLS);
+        } else {
+            // 模式二：从头生成URL
+            baseUrl = generateBaseUrlFromScratch(data);
+        }
+
+        // 基于选定的基础URL，应用变异策略生成最终的URL
         MutationStrategy strategy = data.pickValue(MutationStrategy.values());
-        String jdbcUrl = generateMutatedUrlForCVE(data, strategy, targetFilter);
+        String jdbcUrl = applyMutationsToBaseUrl(data, baseUrl, strategy);
 
         if (!STATS_ONLY && (OUTPUT_ALL || executionCount % OUTPUT_EVERY_N == 0)) {
-            System.out.printf("[INFO #%d] Testing %s with strategy %s\n",
-                    executionCount, targetFilter.getHarnessNumber(), strategy.getDescription());
-            System.out.printf("[INFO #%d] URL: %s\n", executionCount, jdbcUrl);
+            System.out.printf("[INFO #%d] Testing %s with strategy %s (Mode: %s)\n",
+                    executionCount, targetFilter.getHarnessNumber(), strategy.getDescription(), useSeed ? "Seed" : "Generate");
+            System.out.printf("[INFO #%d] Base URL: %s\n", executionCount, baseUrl);
+            System.out.printf("[INFO #%d] Final URL: %s\n", executionCount, jdbcUrl);
         }
 
         // 测试过滤器
@@ -134,30 +180,38 @@ public class EnhancedMySQLJdbcUrlFuzzer {
     }
 
     /**
-     * 生成针对特定CVE的变异URL
+     * 从零开始生成一个基础JDBC URL
      */
-    private static String generateMutatedUrlForCVE(FuzzedDataProvider data,
-                                                   MutationStrategy strategy,
-                                                   HarnessFilter filter) {
+    private static String generateBaseUrlFromScratch(FuzzedDataProvider data) {
         StringBuilder url = new StringBuilder("jdbc:mysql://");
-
-        // Host部分
         url.append(data.pickValue(new String[]{"localhost", "127.0.0.1", "::1"}));
-        url.append(":").append(3306);
+        url.append(":").append(data.pickValue(new Integer[]{3306, 3307, 3308}));
         url.append("/").append(data.pickValue(new String[]{"test", "mysql", "db", ""}));
-        url.append("?");
+        return url.toString();
+    }
 
-        // 构建参数列表
-        List<String> params = new ArrayList<>();
+    /**
+     * 在给定的基础URL上应用变异策略
+     * 这个方法会向URL添加带有各种变异的危险参数
+     */
+    private static String applyMutationsToBaseUrl(FuzzedDataProvider data,
+                                                  String baseUrl,
+                                                  MutationStrategy strategy) {
+        StringBuilder url = new StringBuilder(baseUrl);
 
-        // 添加一些正常参数
-        if (data.consumeBoolean()) {
-            params.add("useSSL=false");
+        // 检查基础URL是否已有参数
+        if (baseUrl.contains("?")) {
+            // 如果URL以 '?' 结尾，不添加任何东西。否则添加 '&'
+            if (!baseUrl.endsWith("?") && !baseUrl.endsWith("&")) {
+                url.append("&");
+            }
+        } else {
+            url.append("?");
         }
 
-        // 从危险参数池中选择参数进行测试
-        // 这些参数可能会触发各种CVE的过滤器
-        int numDangerousParams = data.consumeInt(1, 4);
+        // 构建一个包含变异后危险参数的列表
+        List<String> params = new ArrayList<>();
+        int numDangerousParams = data.consumeInt(1, 3);
         for (int i = 0; i < numDangerousParams; i++) {
             String dangerousParam = data.pickValue(DANGEROUS_PARAMETERS);
             String value = data.pickValue(new String[]{
@@ -166,7 +220,7 @@ public class EnhancedMySQLJdbcUrlFuzzer {
             params.add(applyMutation(dangerousParam, value, strategy, data));
         }
 
-        // 组合参数
+        // 将新的参数附加到URL上
         url.append(String.join("&", params));
 
         return url.toString();
@@ -177,7 +231,6 @@ public class EnhancedMySQLJdbcUrlFuzzer {
      */
     private static void testFilterWithConnection(String jdbcUrl, HarnessFilter filter, long executionCount) {
         Connection conn = null;
-        boolean filterBypassed = false;
 
         try {
             // 首先通过过滤器
@@ -188,12 +241,11 @@ public class EnhancedMySQLJdbcUrlFuzzer {
             try {
                 conn = DriverManager.getConnection(filteredUrl + "&useSSL=false", "user", "password");
 
-                // 如果连接成功且没有触发Hook，记录为潜在的过滤器绕过
+                // 如果连接成功且没有触发Hook，这本身不算绕过，因为Hook只关心特定行为（如读文件）
                 if (!STATS_ONLY && OUTPUT_ALL) {
-                    System.out.printf("[POTENTIAL BYPASS] %s filter allowed URL: %s\n",
+                    System.out.printf("[FILTER PASSED] %s filter passed URL: %s\n",
                             filter.getHarnessNumber(), jdbcUrl);
                 }
-                filterBypassed = true;
 
             } catch (SQLException e) {
                 // 检查是否是Hook触发的异常
@@ -266,11 +318,11 @@ public class EnhancedMySQLJdbcUrlFuzzer {
                 result = key.replace("a", "\\a") + "=" + value;
                 break;
             case MIXED_ENCODING:
-                String mixedKey = "";
+                StringBuilder mixedKey = new StringBuilder();
                 for (char c : key.toCharArray()) {
-                    mixedKey += data.consumeBoolean() ? "%" + String.format("%02X", (int) c) : c;
+                    mixedKey.append(data.consumeBoolean() ? "%" + String.format("%02X", (int) c) : c);
                 }
-                result = mixedKey + "=" + value;
+                result = mixedKey.toString() + "=" + value;
                 break;
             default: // STANDARD
                 result = key + "=" + value;
@@ -329,7 +381,7 @@ public class EnhancedMySQLJdbcUrlFuzzer {
         String timestamp = new SimpleDateFormat("yyyyMMdd-HHmmss-SSS").format(new Date());
         String fileName = String.format("findings/%s-bypass-%s.txt", filter.getHarnessNumber(), timestamp);
 
-        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName, true))) {
             writer.println("!!! FILTER BYPASS DETECTED !!!");
             writer.println("====================================");
             writer.println("CVE Number: " + filter.getHarnessNumber());
@@ -339,6 +391,7 @@ public class EnhancedMySQLJdbcUrlFuzzer {
             writer.println("------------------------------------");
             writer.println("Stack Trace:");
             cause.printStackTrace(writer);
+            writer.println("\n");
 
             System.out.println("\n[SECURITY] Filter bypass logged to: " + fileName);
 
