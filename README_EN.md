@@ -75,6 +75,15 @@ Case outline:
 - 2025-04-20 L0ne1y contributed case collection
   [real-world-case/2025-04-20-L0ne1y](real-world-case/2025-04-20-L0ne1y)
 
+## Other Excellent Open-source JDBC Projects
+
+tricks:
+- cwkiller [JDBC-PROXY-Bypass](https://github.com/cwkiller/JDBC-PROXY-Bypass) : Bypassing JDBC Attack Detection with Proxy Driver
+
+JDBC tools:
+- rmb122 [rogue_mysql_server](https://github.com/rmb122/rogue_mysql_server) : A rouge mysql server supports reading files from most mysql libraries of multiple programming languages.
+
+
 ## 🤝 Contribution Guidelines
 
 Contributions of new JDBC security research findings are welcome! Please follow these steps:

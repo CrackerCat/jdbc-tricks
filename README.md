@@ -77,6 +77,14 @@ jdbc-tricks/
 - 2025-04-20 L0ne1y 贡献案例集
   [real-world-case/2025-04-20-L0ne1y](real-world-case/2025-04-20-L0ne1y)
 
+## 其他优秀的开源JDBC 项目
+
+tricks:
+- cwkiller [JDBC-PROXY-Bypass](https://github.com/cwkiller/JDBC-PROXY-Bypass) : 利用代理驱动绕过JDBC Attack检测
+
+JDBC tools:
+- rmb122 [rogue_mysql_server](https://github.com/rmb122/rogue_mysql_server) : A rouge mysql server supports reading files from most mysql libraries of multiple programming languages.
+
 ## 🤝 贡献指南
 
 欢迎贡献新的JDBC安全研究成果！请遵循以下步骤：
