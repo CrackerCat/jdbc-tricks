@@ -67,6 +67,8 @@ jdbc-tricks/
 
 ### Other Driver Tricks
 
+#### H2 JDBC Tricks
+
 > TODO
 
 ## 🔥 真实世界漏洞案例
